@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "601220760885",
+    "project_id": "my-application-f122d",
+    "storage_bucket": "my-application-f122d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:601220760885:android:a46fa3ca165ffbd6adb87c",
+        "android_client_info": {
+          "package_name": "np.com.bimalkafle.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnLcvu4dZMST3asfqAxzh5UJW880MJhjU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
