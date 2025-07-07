@@ -113,7 +113,7 @@ fun ClassPage(modifier: Modifier = Modifier) {
 
 
             LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                items(allClass) { course -> ClassCard(course) }

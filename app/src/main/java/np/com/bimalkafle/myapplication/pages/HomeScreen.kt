@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import np.com.bimalkafle.myapplication.component.AddUserModal
 import np.com.bimalkafle.myapplication.pages.*
 import np.com.bimalkafle.myapplication.component.ModalForm
 
@@ -42,6 +43,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     )
 
     val showAddClassDialog  = remember { mutableStateOf(false) }
+    val showModalAddUser = remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -103,7 +105,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 title = "Add new user",
                 icon = Icons.Default.Person
                 ) {
-                // TODO: handle action
+                showModalAddUser.value = true
             }
             AddMenuItem(
                 title = "Add teacher",
@@ -126,6 +128,15 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 )
             }
 
+            if (showModalAddUser.value) {
+                AddUserModal(
+                    onDismiss = { showModalAddUser.value = false },
+                    onSave = { name, email, phone, role ->
+                        println("User: $name, $email, $phone, $role")
+                        showModalAddUser.value = false
+                    }
+                )
+            }
 
         }
     }
