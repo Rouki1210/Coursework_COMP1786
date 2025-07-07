@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
+import np.com.bimalkafle.myapplication.model.User
 
 
 @Composable
@@ -59,8 +60,3 @@ fun UserCard(user: User) {
 }
 
 
-data class User(
-    val name: String,
-    val email: String,
-    val role: String,
-)

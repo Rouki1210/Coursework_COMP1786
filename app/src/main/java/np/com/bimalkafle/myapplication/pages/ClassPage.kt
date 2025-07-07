@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Search
@@ -28,15 +27,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.unit.dp
-import np.com.bimalkafle.myapplication.component.User
-import np.com.bimalkafle.myapplication.component.UserCard
-import org.jetbrains.annotations.ApiStatus
+import np.com.bimalkafle.myapplication.model.Course
+import np.com.bimalkafle.myapplication.component.ClassCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,13 +44,23 @@ fun ClassPage(modifier: Modifier = Modifier) {
         mutableStateOf("")
     }
 
-    val allUsers = listOf(
-        User("John Doe", "john.doe@email.com", "Teacher"),
-        User("Jane Smith", "jane.smith@email.com", "Student"),
-        User("Alice Brown", "alice.brown@email.com", "Admin"),
-        User("Bob White", "bob.white@email.com", "Student"),
-        User("Bob White", "bob.white@email.com", "Student"),
-
+    val allClass = listOf(
+        Course(
+            classId = "class01",
+            name = "Vinyasa Flow",
+            description = "A dynamic flowing yoga class for strength and flexibility.",
+            durationMinutes = 60,
+            maxCapacity = 20,
+            teacherId = "teacher01",
+        ),
+        Course(
+            classId = "class02",
+            name = "Yin Yoga",
+            description = "A slow-paced yoga class focusing on deep stretches and meditation.",
+            durationMinutes = 45,
+            maxCapacity = 15,
+            teacherId = "teacher02",
+        )
     )
 
     Scaffold(
@@ -73,11 +81,12 @@ fun ClassPage(modifier: Modifier = Modifier) {
                 .fillMaxSize()
                 .background(Color(0xFF121212))
                 .padding(innerPadding)
+                .padding(bottom = 20.dp)
         ) {
-          /*  TopAppBar(
+        TopAppBar(
                 title = {
                     Text(
-                        "Users",
+                        "Class",
                         color = Color.White,
                         fontWeight = FontWeight.Bold
                     )
@@ -86,14 +95,14 @@ fun ClassPage(modifier: Modifier = Modifier) {
                     containerColor = Color(0xFF1F1F1F),
                     titleContentColor = Color.White
                 )
-            )*/
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Search users...") },
+                placeholder = { Text("Search class...") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -107,9 +116,7 @@ fun ClassPage(modifier: Modifier = Modifier) {
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(allUsers){ user ->
-                    UserCard(user)
-                }
+               items(allClass) { course -> ClassCard(course) }
             }
         }
     }
