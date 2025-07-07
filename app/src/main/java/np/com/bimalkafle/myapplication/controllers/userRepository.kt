@@ -4,7 +4,7 @@ import com.google.firebase.database.FirebaseDatabase
 import np.com.bimalkafle.myapplication.model.User
 
 object UserRepository {
-    private val db = FirebaseDatabase.getInstance().getReference("users")
+    private val db = FirebaseDatabase.getInstance("https://my-application-f122d-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("users")
 
     fun addUser(user: User){
         val userId = db.push().key ?: run{

@@ -42,7 +42,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         DashboardItem(12, "Orders", Icons.Default.ShoppingCart)
     )
 
-    val showAddClassDialog  = remember { mutableStateOf(false) }
+    val showAddTeacherDialog  = remember { mutableStateOf(false) }
     val showModalAddUser = remember { mutableStateOf(false) }
 
     Column(
@@ -110,20 +110,22 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             AddMenuItem(
                 title = "Add teacher",
                 icon = Icons.Default.School
-            ) { }
+            ) {
+                showAddTeacherDialog.value = true
+            }
             AddMenuItem(
                 title = "Add Class",
                 icon = Icons.Default.Museum
             ) {
-                showAddClassDialog.value = true
+
             }
 
-            if (showAddClassDialog.value) {
+            if(showAddTeacherDialog.value){
                 ModalForm(
-                    onDismiss = { showAddClassDialog.value = false },
-                    onSave = { className ->
-                        println("Saved class: $className")
-                        showAddClassDialog.value = false
+                    onDismiss = { showAddTeacherDialog.value = false },
+                    onSave = { name, email, phone, role ->
+                        println("User: $name, $email, $phone, $role")
+                        showAddTeacherDialog.value = false
                     }
                 )
             }
