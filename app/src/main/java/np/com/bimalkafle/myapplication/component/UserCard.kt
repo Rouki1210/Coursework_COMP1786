@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
+import np.com.bimalkafle.myapplication.controllers.UserRepository
 import np.com.bimalkafle.myapplication.model.User
 
 
@@ -35,6 +36,11 @@ fun UserCard(user: User) {
                 fontSize = 14.sp
             )
             Text(
+                user.phone.toString(),
+                color = Color.LightGray,
+                fontSize = 14.sp
+            )
+            Text(
                 "Role: ${user.role}",
                 color = Color.LightGray,
                 fontSize = 14.sp
@@ -50,7 +56,7 @@ fun UserCard(user: User) {
                     Text("Edit", color = Color.White)
                 }
                 TextButton(onClick = {
-                    // TODO: handle delete
+                    UserRepository.deleteUser(user.userId)
                 }) {
                     Text("Delete", color = Color.Red)
                 }

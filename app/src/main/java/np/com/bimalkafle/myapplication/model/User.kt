@@ -6,7 +6,7 @@ data class User(
     val email: String = "",
     val phone: String? = null,
     val role: UserRole = UserRole.CUSTOMER,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: String = "",
 )
 
 enum class UserRole {

@@ -34,11 +34,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import np.com.bimalkafle.myapplication.component.AddUserModal
 import np.com.bimalkafle.myapplication.component.UserCard
+import np.com.bimalkafle.myapplication.controllers.UserRepository
 import np.com.bimalkafle.myapplication.model.User
 import org.jetbrains.annotations.ApiStatus
 
@@ -51,14 +53,22 @@ fun UserPage(modifier: Modifier = Modifier) {
     }
     val showModalAddUser = remember { mutableStateOf(false) }
 
-    val allUsers = listOf(
-        User("John Doe", "john.doe@email.com", "Teacher"),
-        User("Jane Smith", "jane.smith@email.com", "Student"),
-        User("Alice Brown", "alice.brown@email.com", "Admin"),
-        User("Bob White", "bob.white@email.com", "Student"),
-        User("Bob White", "bob.white@email.com", "Student"),
+    var allUsers by remember { mutableStateOf<List<User>>(emptyList()) }
 
-        )
+    LaunchedEffect(Unit) {
+        UserRepository.getAllUser { users ->
+            allUsers = users
+        }
+    }
+
+//    val allUsers = listOf(
+//        User("John Doe", "john.doe@email.com", "Teacher"),
+//        User("Jane Smith", "jane.smith@email.com", "Student"),
+//        User("Alice Brown", "alice.brown@email.com", "Admin"),
+//        User("Bob White", "bob.white@email.com", "Student"),
+//        User("Bob White", "bob.white@email.com", "Student"),
+//
+//        )
 
     Scaffold(
         floatingActionButton = {
@@ -88,11 +98,11 @@ fun UserPage(modifier: Modifier = Modifier) {
                         fontWeight = FontWeight.Bold
                     )
                 },
-                navigationIcon = {
-                    IconButton(onClick = {showModalAddUser.value = true}) {
+                actions = {
+                    IconButton(onClick = { showModalAddUser.value = true }) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Menu",
+                            contentDescription = "Add User",
                             tint = Color.White
                         )
                     }
