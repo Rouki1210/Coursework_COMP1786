@@ -55,6 +55,7 @@ dependencies {
     implementation ("androidx.compose.runtime:runtime-livedata:1.8.2")
     implementation ("androidx.compose.material:material-icons-extended:1.6.0")
     implementation(libs.firebase.database.ktx)
+    implementation ("com.google.accompanist:accompanist-swiperefresh:0.33.2-alpha")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,7 +30,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.LaunchedEffect
@@ -43,6 +41,10 @@ import np.com.bimalkafle.myapplication.component.UserCard
 import np.com.bimalkafle.myapplication.controllers.UserRepository
 import np.com.bimalkafle.myapplication.model.User
 import org.jetbrains.annotations.ApiStatus
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +54,7 @@ fun UserPage(modifier: Modifier = Modifier) {
         mutableStateOf("")
     }
     val showModalAddUser = remember { mutableStateOf(false) }
+    var isRefreshing by remember { mutableStateOf(false) }
 
     var allUsers by remember { mutableStateOf<List<User>>(emptyList()) }
 
@@ -61,14 +64,13 @@ fun UserPage(modifier: Modifier = Modifier) {
         }
     }
 
-//    val allUsers = listOf(
-//        User("John Doe", "john.doe@email.com", "Teacher"),
-//        User("Jane Smith", "jane.smith@email.com", "Student"),
-//        User("Alice Brown", "alice.brown@email.com", "Admin"),
-//        User("Bob White", "bob.white@email.com", "Student"),
-//        User("Bob White", "bob.white@email.com", "Student"),
-//
-//        )
+    fun refreshData(){
+        isRefreshing = true
+        UserRepository.getAllUser { fetchedUser ->
+            allUsers = fetchedUser
+            isRefreshing = false
+        }
+    }
 
     Scaffold(
         floatingActionButton = {
@@ -99,7 +101,9 @@ fun UserPage(modifier: Modifier = Modifier) {
                     )
                 },
                 actions = {
-                    IconButton(onClick = { showModalAddUser.value = true }) {
+                    IconButton(onClick = {
+                        showModalAddUser.value = true
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = "Add User",
@@ -119,6 +123,7 @@ fun UserPage(modifier: Modifier = Modifier) {
                     onSave = { name, email, phone, role ->
                         println("User: $name, $email, $phone, $role")
                         showModalAddUser.value = false
+                        refreshData()
                     }
                 )
             }
@@ -138,12 +143,18 @@ fun UserPage(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(16.dp))
 
 
-            LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            SwipeRefresh(
+                state = rememberSwipeRefreshState(isRefreshing),
+                onRefresh = { refreshData() }
             ) {
-                items(allUsers){ user ->
-                    UserCard(user)
+                LazyColumn(
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 28.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(allUsers) { user ->
+                        UserCard(user)
+                        refreshData()
+                    }
                 }
             }
         }

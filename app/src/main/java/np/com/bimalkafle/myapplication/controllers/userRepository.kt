@@ -52,6 +52,42 @@ object UserRepository {
             }
     }
 
+    fun getAllTeacher(onResult: (List<User>) -> Unit) {
+        db.get()
+            .addOnSuccessListener { snapshot ->
+                val teacherList = mutableListOf<User>()
+
+                for (userSnapshot in snapshot.children) {
+                    val userId = userSnapshot.key ?: continue
+                    val name = userSnapshot.child("name").getValue(String::class.java) ?: ""
+                    val email = userSnapshot.child("email").getValue(String::class.java) ?: ""
+                    val phone = userSnapshot.child("phone").getValue(String::class.java) ?: ""
+                    val roleStr = userSnapshot.child("role").getValue(String::class.java) ?: ""
+                    val createdAt =
+                        userSnapshot.child("createAt").getValue(String::class.java) ?: ""
+
+                    val roleEnum = try {
+                        UserRole.valueOf(roleStr)
+                    } catch (e: Exception) {
+                        UserRole.CUSTOMER
+                    }
+
+                    if (roleEnum == UserRole.TEACHER) {
+                        val teacher = User(
+                            userId = userId,
+                            name = name,
+                            email = email,
+                            phone = phone,
+                            role = roleEnum,
+                            createdAt = createdAt
+                        )
+                        teacherList.add(teacher)
+                    }
+                }
+                onResult(teacherList)
+            }
+    }
+
     fun deleteUser(userId: String) {
         db.child(userId).removeValue()
     }

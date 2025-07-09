@@ -15,15 +15,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import np.com.bimalkafle.myapplication.component.AddClassModal
 import np.com.bimalkafle.myapplication.component.AddUserModal
 import np.com.bimalkafle.myapplication.pages.*
 import np.com.bimalkafle.myapplication.component.ModalForm
-
+import np.com.bimalkafle.myapplication.controllers.UserRepository
+import np.com.bimalkafle.myapplication.model.User
 
 
 data class DashboardItem(
@@ -35,15 +40,30 @@ data class DashboardItem(
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
 
+    var allUsers by remember { mutableStateOf<List<User>>(emptyList()) }
+    var allTeacher by remember { mutableStateOf<List<User>>(emptyList()) }
+    val showAddTeacherDialog  = remember { mutableStateOf(false) }
+    val showModalAddUser = remember { mutableStateOf(false) }
+    val showModalAddClass = remember { mutableStateOf(false) }
+    val userCount = allUsers.size
+    val teacherCount = allTeacher.size
+
+
+    LaunchedEffect(Unit) {
+        UserRepository.getAllUser { users ->
+            allUsers = users
+        }
+        UserRepository.getAllTeacher { teachers ->
+            allTeacher = teachers
+        }
+    }
+
     val dashboardItems = listOf(
-        DashboardItem(1000, "Users", Icons.Default.Person),
-        DashboardItem(10, "Teacher", Icons.Default.School),
+        DashboardItem(userCount, "Users", Icons.Default.Person),
+        DashboardItem(teacherCount, "Teacher", Icons.Default.School),
         DashboardItem(35, "Classes", Icons.Default.Museum),
         DashboardItem(12, "Orders", Icons.Default.ShoppingCart)
     )
-
-    val showAddTeacherDialog  = remember { mutableStateOf(false) }
-    val showModalAddUser = remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -117,7 +137,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 title = "Add Class",
                 icon = Icons.Default.Museum
             ) {
-
+                showModalAddClass.value = true
             }
 
             if(showAddTeacherDialog.value){
@@ -136,6 +156,16 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     onSave = { name, email, phone, role ->
                         println("User: $name, $email, $phone, $role")
                         showModalAddUser.value = false
+                    }
+                )
+            }
+
+            if(showModalAddClass.value){
+                AddClassModal(
+                    onDismiss = {showModalAddClass.value = false},
+                    onSave = { name, desc, duration, capacity, teacherId ->
+                        println("Class = $name, $desc, $duration, $capacity, $teacherId")
+                        showModalAddClass.value = false
                     }
                 )
             }

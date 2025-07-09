@@ -12,11 +12,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
-import np.com.bimalkafle.myapplication.model.Course
+import np.com.bimalkafle.myapplication.model.Class
 
 
 @Composable
-fun ClassCard(course: Course) {
+fun ClassCard(aClass: Class) {
+    val descriptionText = if (aClass.description.length > 50) {
+        aClass.description.take(30) + "..."
+    } else {
+        aClass.description
+    }
+
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF2C2C2C)),
@@ -24,31 +30,32 @@ fun ClassCard(course: Course) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                course.name,
+                "${aClass.name} - ${aClass.price}$",
                 color = Color.White,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                course.teacherId,
+                descriptionText,
                 color = Color.LightGray,
                 fontSize = 14.sp
             )
             Text(
-                course.description,
+                "Teacher: ${aClass.teacher}",
                 color = Color.LightGray,
                 fontSize = 14.sp
             )
             Text(
-                "Teacher Id: ${course.teacherId}",
+                "Duration: ${aClass.durationMinutes} mins | Slot: ${aClass.maxCapacity}",
                 color = Color.LightGray,
                 fontSize = 14.sp
             )
             Text(
-                "Duration: ${course.durationMinutes} mins | Slot: ${course.maxCapacity}",
+                "Day: ${aClass.day_of_week} || Time: ${aClass.time_of_course}",
                 color = Color.LightGray,
                 fontSize = 14.sp
             )
+
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 horizontalArrangement = Arrangement.End,
@@ -68,5 +75,3 @@ fun ClassCard(course: Course) {
         }
     }
 }
-
-

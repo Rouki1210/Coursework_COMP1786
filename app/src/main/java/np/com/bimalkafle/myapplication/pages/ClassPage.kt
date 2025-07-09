@@ -25,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -34,8 +33,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.IconButton
 import androidx.compose.ui.unit.dp
-import np.com.bimalkafle.myapplication.model.Course
+import np.com.bimalkafle.myapplication.component.AddClassModal
+import np.com.bimalkafle.myapplication.model.Class
 import np.com.bimalkafle.myapplication.component.ClassCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,24 +46,30 @@ fun ClassPage(modifier: Modifier = Modifier) {
     var searchQuery by remember {
         mutableStateOf("")
     }
-    val showModalAddTeacher = remember { mutableStateOf(false) }
+    val showModalAddClass = remember { mutableStateOf(false) }
 
     val allClass = listOf(
-        Course(
+        Class(
             classId = "class01",
             name = "Vinyasa Flow",
+            day_of_week = "Monday",
+            time_of_course = "10:00",
+            price = "20",
             description = "A dynamic flowing yoga class for strength and flexibility.",
-            durationMinutes = 60,
-            maxCapacity = 20,
-            teacherId = "teacher01",
+            durationMinutes = "60",
+            maxCapacity = "20",
+            teacher = "teacher01",
         ),
-        Course(
+        Class(
             classId = "class02",
             name = "Yin Yoga",
+            day_of_week = "Monday",
+            time_of_course = "10:00",
+            price = "20",
             description = "A slow-paced yoga class focusing on deep stretches and meditation.",
-            durationMinutes = 45,
-            maxCapacity = 15,
-            teacherId = "teacher02",
+            durationMinutes = "45",
+            maxCapacity = "20",
+            teacher = "teacher02",
         )
     )
 
@@ -94,11 +101,32 @@ fun ClassPage(modifier: Modifier = Modifier) {
                         fontWeight = FontWeight.Bold
                     )
                 },
+                actions = {
+                    IconButton(onClick = {
+                        showModalAddClass.value = true
+                    }) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add User",
+                        tint = Color.White
+                    )
+                }
+                },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = Color(0xFF1F1F1F),
                     titleContentColor = Color.White
                 )
             )
+
+            if(showModalAddClass.value){
+                AddClassModal(
+                    onDismiss = {showModalAddClass.value = false},
+                    onSave = { name, desc, duration, capacity, teacherId ->
+                        println("Class = $name, $desc, $duration, $capacity, $teacherId")
+                        showModalAddClass.value = false
+                    }
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -116,11 +144,12 @@ fun ClassPage(modifier: Modifier = Modifier) {
 
 
             LazyColumn(
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
+                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 28.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                items(allClass) { course -> ClassCard(course) }
             }
         }
     }
+
 }
