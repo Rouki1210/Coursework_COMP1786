@@ -14,21 +14,37 @@
     import np.com.bimalkafle.myapplication.controllers.UserRepository
     import np.com.bimalkafle.myapplication.model.Class
     import np.com.bimalkafle.myapplication.model.User
+    import androidx.compose.foundation.lazy.LazyRow
+    import androidx.compose.foundation.lazy.items
+    import androidx.compose.material3.FilterChip
+
 
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun AddClassModal(
         onDismiss: () -> Unit,
-        onSave: (name: String, description: String, durationMinutes: Int, maxCapacity: Int, teacher: String) -> Unit
+        onSave:
+            (name: String, description: String,
+             day_of_week: String,
+             time_of_course: String,
+             price: String ,
+             durationMinutes: String,
+             maxCapacity: String,
+             teacher: String) -> Unit
     ) {
         var name by remember { mutableStateOf("") }
+        var day_of_week by remember { mutableStateOf("") }
+        var time_of_course by remember { mutableStateOf("") }
+        var price by remember { mutableStateOf("") }
         var description by remember { mutableStateOf("") }
         var durationMinutes by remember { mutableStateOf("") }
         var maxCapacity by remember { mutableStateOf("") }
         var expanded by remember { mutableStateOf(false) }
         var selectedTeacher by remember { mutableStateOf<User?>(null) }
         val teachers = remember { mutableStateOf<List<User>>(emptyList()) }
+        val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+        var selectedDays by remember { mutableStateOf(setOf<String>()) }
 
         // Load teachers when this composable opens
         LaunchedEffect(Unit) {
@@ -39,6 +55,7 @@
                 }
             }
         }
+
 
         AlertDialog(
             onDismissRequest = onDismiss,
@@ -62,6 +79,7 @@
                             .fillMaxWidth()
                             .padding(vertical = 4.dp)
                     )
+
                     OutlinedTextField(
                         value = durationMinutes,
                         onValueChange = { durationMinutes = it.filter { char -> char.isDigit() } },
@@ -71,15 +89,70 @@
                             .fillMaxWidth()
                             .padding(vertical = 4.dp)
                     )
-                    OutlinedTextField(
-                        value = maxCapacity,
-                        onValueChange = { maxCapacity = it.filter { char -> char.isDigit() } },
-                        label = { Text("Max Capacity") },
-                        singleLine = true,
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                        LazyRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(daysOfWeek.size) { index ->
+                                val day = daysOfWeek[index]
+                                FilterChip(
+                                    selected = selectedDays.contains(day),
+                                    onClick = {
+                                        selectedDays = if (selectedDays.contains(day)) {
+                                            selectedDays - day
+                                        } else {
+                                            selectedDays + day
+                                        }
+                                    },
+                                    label = { Text(day) }
+                                )
+                            }
+                        }
+
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    )
+                            .padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = time_of_course,
+                            onValueChange = { time_of_course = it },
+                            label = { Text("Time") },
+                            singleLine = true,
+                            modifier = Modifier
+                                .weight(1f)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = price,
+                            onValueChange = { price = it.filter { c -> c.isDigit() || c == '.' } },
+                            label = { Text("Price ($)") },
+                            singleLine = true,
+                            modifier = Modifier
+                                .weight(1f)
+                        )
+                        OutlinedTextField(
+                            value = maxCapacity,
+                            onValueChange = { maxCapacity = it.filter { char -> char.isDigit() } },
+                            label = { Text("Capacity") },
+                            singleLine = true,
+                            modifier = Modifier
+                                .weight(1f)
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -123,13 +196,15 @@
                         onSave(
                             name,
                             description,
-                            durationMinutes.toIntOrNull() ?: 0,
-                            maxCapacity.toIntOrNull() ?: 0,
+                            selectedDays.joinToString(","),
+                            time_of_course,
+                            price,
+                            durationMinutes,
+                            maxCapacity,
                             selectedTeacher?.userId ?: ""
                         )
 
-                        CourseRepository.addCourse(Class("", name, description, durationMinutes, maxCapacity,
-                            selectedTeacher.toString()
+                        CourseRepository.addCourse(Class("", name, selectedDays.joinToString(","), time_of_course, price, description, durationMinutes, maxCapacity, selectedTeacher.toString()
                         ))
                     },
                     enabled = name.isNotBlank() && durationMinutes.isNotBlank() && maxCapacity.isNotBlank() && selectedTeacher != null
