@@ -13,13 +13,16 @@ import np.com.bimalkafle.myapplication.model.UserRole
 @Composable
 fun AddUserModal(
     onDismiss: () -> Unit,
-    onSave: (name: String, email: String, phone: String?, role: UserRole) -> Unit
+    onSave: (name: String, email: String, phone: String?, role: UserRole) -> Unit,
+    initialData: User? = null
 ) {
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf(initialData?.name ?: "") }
+    var email by remember { mutableStateOf(initialData?.email ?: "") }
+    var phone by remember { mutableStateOf(initialData?.phone ?: "") }
     var expanded by remember { mutableStateOf(false) }
-    var selectedRole by remember { mutableStateOf(UserRole.CUSTOMER) }
+    var selectedRole by remember {
+        mutableStateOf(initialData?.role ?: UserRole.CUSTOMER)
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -88,8 +91,20 @@ fun AddUserModal(
         confirmButton = {
             Button(
                 onClick = {
+                    val newUser = User(
+                        userId = initialData?.userId ?: "",
+                        name = name,
+                        email = email,
+                        phone = phone.takeIf { it.isNotBlank() },
+                        role = selectedRole,
+                        createdAt = initialData?.createdAt ?: ""
+                     )
+                    if (initialData == null){
+                        UserRepository.addUser(newUser)
+                    }else{
+                        UserRepository.updateUser(newUser)
+                    }
                     onSave(name, email, phone.takeIf { it.isNotBlank() }, selectedRole)
-                    UserRepository.addUser(User("",name, email, phone, selectedRole))
 
                 },
                 enabled = name.isNotBlank() && email.isNotBlank()

@@ -27,8 +27,10 @@ import np.com.bimalkafle.myapplication.component.AddClassModal
 import np.com.bimalkafle.myapplication.component.AddUserModal
 import np.com.bimalkafle.myapplication.pages.*
 import np.com.bimalkafle.myapplication.component.ModalForm
+import np.com.bimalkafle.myapplication.controllers.CourseRepository
 import np.com.bimalkafle.myapplication.controllers.UserRepository
 import np.com.bimalkafle.myapplication.model.User
+import np.com.bimalkafle.myapplication.model.Class
 
 
 data class DashboardItem(
@@ -42,11 +44,13 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
     var allUsers by remember { mutableStateOf<List<User>>(emptyList()) }
     var allTeacher by remember { mutableStateOf<List<User>>(emptyList()) }
+    var allClass by remember { mutableStateOf<List<Class>>(emptyList()) }
     val showAddTeacherDialog  = remember { mutableStateOf(false) }
     val showModalAddUser = remember { mutableStateOf(false) }
     val showModalAddClass = remember { mutableStateOf(false) }
     val userCount = allUsers.size
     val teacherCount = allTeacher.size
+    val classCount = allClass.size
 
 
     LaunchedEffect(Unit) {
@@ -56,12 +60,15 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         UserRepository.getAllTeacher { teachers ->
             allTeacher = teachers
         }
+        CourseRepository.getAllCourse { classes ->
+            allClass = classes
+        }
     }
 
     val dashboardItems = listOf(
         DashboardItem(userCount, "Users", Icons.Default.Person),
         DashboardItem(teacherCount, "Teacher", Icons.Default.School),
-        DashboardItem(35, "Classes", Icons.Default.Museum),
+        DashboardItem(classCount, "Classes", Icons.Default.Museum),
         DashboardItem(12, "Orders", Icons.Default.ShoppingCart)
     )
 

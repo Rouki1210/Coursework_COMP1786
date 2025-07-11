@@ -43,7 +43,7 @@ import np.com.bimalkafle.myapplication.model.User
 import org.jetbrains.annotations.ApiStatus
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-
+import np.com.bimalkafle.myapplication.controllers.CourseRepository
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,9 +58,11 @@ fun UserPage(modifier: Modifier = Modifier) {
 
     var allUsers by remember { mutableStateOf<List<User>>(emptyList()) }
 
-    LaunchedEffect(Unit) {
-        UserRepository.getAllUser { users ->
-            allUsers = users
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.isBlank()) {
+            UserRepository.getAllUser { allUsers = it }
+        } else {
+            UserRepository.getUserByName(searchQuery) { allUsers = it }
         }
     }
 
@@ -76,7 +78,7 @@ fun UserPage(modifier: Modifier = Modifier) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    // TODO: handle add new user
+                    showModalAddUser.value = true
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
@@ -153,7 +155,6 @@ fun UserPage(modifier: Modifier = Modifier) {
                 ) {
                     items(allUsers) { user ->
                         UserCard(user)
-                        refreshData()
                     }
                 }
             }

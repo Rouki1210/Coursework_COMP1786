@@ -25,26 +25,33 @@
     fun AddClassModal(
         onDismiss: () -> Unit,
         onSave:
-            (name: String, description: String,
+            (name: String,
+             description: String,
              day_of_week: String,
              time_of_course: String,
              price: String ,
              durationMinutes: String,
              maxCapacity: String,
-             teacher: String) -> Unit
+             teacher: String) -> Unit,
+        initialData: Class? = null
     ) {
-        var name by remember { mutableStateOf("") }
-        var day_of_week by remember { mutableStateOf("") }
-        var time_of_course by remember { mutableStateOf("") }
-        var price by remember { mutableStateOf("") }
-        var description by remember { mutableStateOf("") }
-        var durationMinutes by remember { mutableStateOf("") }
-        var maxCapacity by remember { mutableStateOf("") }
-        var expanded by remember { mutableStateOf(false) }
+        var name by remember { mutableStateOf(initialData?.name ?: "") }
+        var day_of_week by remember { mutableStateOf(initialData?.day_of_week ?: "") }
+        var time_of_course by remember { mutableStateOf(initialData?.time_of_course ?: "") }
+        var price by remember { mutableStateOf(initialData?.price ?: "") }
+        var description by remember { mutableStateOf(initialData?.description ?: "") }
+        var durationMinutes by remember { mutableStateOf(initialData?.durationMinutes ?: "") }
+        var maxCapacity by remember { mutableStateOf(initialData?.maxCapacity ?: "") }
+        var selectedDays by remember {
+            mutableStateOf(
+                initialData?.day_of_week?.split(",")?.toSet() ?: emptySet()
+            )
+        }
         var selectedTeacher by remember { mutableStateOf<User?>(null) }
+
+        var expanded by remember { mutableStateOf(false) }
         val teachers = remember { mutableStateOf<List<User>>(emptyList()) }
         val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-        var selectedDays by remember { mutableStateOf(setOf<String>()) }
 
         // Load teachers when this composable opens
         LaunchedEffect(Unit) {
@@ -193,6 +200,23 @@
             confirmButton = {
                 Button(
                     onClick = {
+                        val newClass = Class(
+                            classId = initialData?.classId ?: "",
+                            name = name,
+                            day_of_week = selectedDays.joinToString(","),
+                            time_of_course = time_of_course,
+                            price = price,
+                            description = description,
+                            durationMinutes = durationMinutes,
+                            maxCapacity = maxCapacity,
+                            teacher = selectedTeacher?.name ?: "",
+                            createdAt = initialData?.createdAt ?: ""
+                        )
+                        if(initialData == null){
+                            CourseRepository.addCourse(newClass)
+                        }else{
+                            CourseRepository.updateClass(newClass)
+                        }
                         onSave(
                             name,
                             description,
@@ -201,11 +225,8 @@
                             price,
                             durationMinutes,
                             maxCapacity,
-                            selectedTeacher?.userId ?: ""
+                            selectedTeacher?.name ?: ""
                         )
-
-                        CourseRepository.addCourse(Class("", name, selectedDays.joinToString(","), time_of_course, price, description, durationMinutes, maxCapacity, selectedTeacher.toString()
-                        ))
                     },
                     enabled = name.isNotBlank() && durationMinutes.isNotBlank() && maxCapacity.isNotBlank() && selectedTeacher != null
                 ) {

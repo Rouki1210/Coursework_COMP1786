@@ -1,6 +1,7 @@
 package np.com.bimalkafle.myapplication.controllers
 
 import com.google.firebase.database.FirebaseDatabase
+import np.com.bimalkafle.myapplication.model.Class
 import np.com.bimalkafle.myapplication.model.User
 import np.com.bimalkafle.myapplication.model.UserRole
 import java.text.SimpleDateFormat
@@ -52,6 +53,42 @@ object UserRepository {
             }
     }
 
+    fun getUserByName(userName: String, onResult: (List<User>) -> Unit) {
+        db.get()
+            .addOnSuccessListener { snapshot ->
+                val result = mutableListOf<User>()
+                snapshot.children.forEach { child ->
+                    val user = child.getValue(User::class.java)
+                    if (user != null && user.name.contains(userName, ignoreCase = true)) {
+                        result.add(user.copy(userId = child.key ?: ""))
+                    }
+                }
+                onResult(result)
+            }
+            .addOnFailureListener { exception ->
+                // handle failure gracefully
+                onResult(emptyList())
+            }
+    }
+
+
+    fun getTeacherByName(teacherName: String, onResult: (List<User>) -> Unit) {
+        db.get()
+            .addOnSuccessListener { snapshot ->
+                val result = mutableListOf<User>()
+                snapshot.children.forEach { child ->
+                    val user = child.getValue(User::class.java)
+                    if (user != null &&
+                        user.role == UserRole.TEACHER &&
+                        user.name.contains(teacherName, ignoreCase = true)){
+                        result.add(user.copy(userId = child.key ?: ""))
+                    }
+                }
+                onResult(result)
+            }
+    }
+
+
     fun getAllTeacher(onResult: (List<User>) -> Unit) {
         db.get()
             .addOnSuccessListener { snapshot ->
@@ -63,8 +100,7 @@ object UserRepository {
                     val email = userSnapshot.child("email").getValue(String::class.java) ?: ""
                     val phone = userSnapshot.child("phone").getValue(String::class.java) ?: ""
                     val roleStr = userSnapshot.child("role").getValue(String::class.java) ?: ""
-                    val createdAt =
-                        userSnapshot.child("createAt").getValue(String::class.java) ?: ""
+                    val createdAt = userSnapshot.child("createAt").getValue(String::class.java) ?: ""
 
                     val roleEnum = try {
                         UserRole.valueOf(roleStr)
@@ -86,6 +122,26 @@ object UserRepository {
                 }
                 onResult(teacherList)
             }
+    }
+
+    fun updateUser(user: User){
+        val userId = user.userId
+        if (userId.isBlank()){
+            return
+        }
+
+        val userRef = db.child(userId)
+
+        val userUpdate = mapOf(
+            "name" to user.name,
+            "email" to user.email,
+            "phone" to user.phone,
+            "role" to user.role.name,
+            "createdAt" to user.createdAt
+        )
+
+        userRef.updateChildren(userUpdate)
+
     }
 
     fun deleteUser(userId: String) {

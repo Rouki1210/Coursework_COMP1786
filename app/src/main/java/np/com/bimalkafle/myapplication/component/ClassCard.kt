@@ -7,11 +7,17 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
+import np.com.bimalkafle.myapplication.controllers.CourseRepository
 import np.com.bimalkafle.myapplication.model.Class
 
 
@@ -21,6 +27,34 @@ fun ClassCard(aClass: Class) {
         aClass.description.take(30) + "..."
     } else {
         aClass.description
+    }
+
+
+
+    val showEditModal = remember { mutableStateOf(false) }
+    var classToEdit by remember { mutableStateOf<Class?>(null) }
+
+    if(showEditModal.value && classToEdit != null){
+        AddClassModal(
+            onDismiss = {
+                showEditModal.value = false
+            },
+            onSave = { name, desc, dayofweek, timeofcourse, price, duration, capacity, teacher ->
+                val updatedClass = classToEdit!!.copy(
+                    name = name,
+                    description = desc,
+                    day_of_week = dayofweek,
+                    time_of_course = timeofcourse,
+                    price = price,
+                    durationMinutes = duration,
+                    maxCapacity = capacity,
+                    teacher = teacher
+                )
+                CourseRepository.updateClass(updatedClass)
+                showEditModal.value = false
+            },
+            initialData = classToEdit
+        )
     }
 
     Card(
@@ -62,12 +96,13 @@ fun ClassCard(aClass: Class) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 TextButton(onClick = {
-                    // TODO: handle edit
+                    classToEdit = aClass
+                    showEditModal.value = true
                 }) {
                     Text("Edit", color = Color.White)
                 }
                 TextButton(onClick = {
-                    // TODO: handle delete
+                   CourseRepository.deleteUser(classId = aClass.classId)
                 }) {
                     Text("Delete", color = Color.Red)
                 }

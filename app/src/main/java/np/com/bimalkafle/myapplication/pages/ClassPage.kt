@@ -1,6 +1,7 @@
 package np.com.bimalkafle.myapplication.pages
 
 
+import android.R.attr.onClick
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Search
@@ -31,13 +33,16 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.IconButton
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import np.com.bimalkafle.myapplication.component.AddClassModal
 import np.com.bimalkafle.myapplication.model.Class
 import np.com.bimalkafle.myapplication.component.ClassCard
+import np.com.bimalkafle.myapplication.controllers.CourseRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,37 +52,30 @@ fun ClassPage(modifier: Modifier = Modifier) {
         mutableStateOf("")
     }
     val showModalAddClass = remember { mutableStateOf(false) }
+    var isRefreshing by remember { mutableStateOf(false) }
+    var allClass by remember { mutableStateOf<List<Class>>(emptyList()) }
 
-    val allClass = listOf(
-        Class(
-            classId = "class01",
-            name = "Vinyasa Flow",
-            day_of_week = "Monday",
-            time_of_course = "10:00",
-            price = "20",
-            description = "A dynamic flowing yoga class for strength and flexibility.",
-            durationMinutes = "60",
-            maxCapacity = "20",
-            teacher = "teacher01",
-        ),
-        Class(
-            classId = "class02",
-            name = "Yin Yoga",
-            day_of_week = "Monday",
-            time_of_course = "10:00",
-            price = "20",
-            description = "A slow-paced yoga class focusing on deep stretches and meditation.",
-            durationMinutes = "45",
-            maxCapacity = "20",
-            teacher = "teacher02",
-        )
-    )
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.isBlank()) {
+            CourseRepository.getAllCourse { allClass = it }
+        } else {
+            CourseRepository.getClassByName(searchQuery) { allClass = it }
+        }
+    }
+
+    fun refreshData(){
+        isRefreshing = true
+        CourseRepository.getAllCourse { fetchedClass ->
+            allClass = fetchedClass
+            isRefreshing = false
+        }
+    }
 
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    // TODO: handle add new user
+                    showModalAddClass.value = true
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
@@ -124,7 +122,9 @@ fun ClassPage(modifier: Modifier = Modifier) {
                     onSave = { name, desc, dayofweek, timeofcourse, price, duration, capacity, teacher ->
                         println("Class = $name, $desc, $duration, $capacity, $teacher, $dayofweek, $timeofcourse, $price")
                         showModalAddClass.value = false
+                        refreshData()
                     }
+
                 )
             }
 
@@ -143,11 +143,18 @@ fun ClassPage(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(16.dp))
 
 
-            LazyColumn(
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 28.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            SwipeRefresh(
+                state = rememberSwipeRefreshState(isRefreshing),
+                onRefresh = { refreshData() }
             ) {
-               items(allClass) { course -> ClassCard(course) }
+                LazyColumn(
+                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 28.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(allClass) { aclass ->
+                        ClassCard(aclass)
+                    }
+                }
             }
         }
     }

@@ -42,7 +42,9 @@ import np.com.bimalkafle.myapplication.model.User
 import org.jetbrains.annotations.ApiStatus
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import np.com.bimalkafle.myapplication.component.ClassCard
 import np.com.bimalkafle.myapplication.component.ModalForm
+import np.com.bimalkafle.myapplication.controllers.CourseRepository
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,9 +59,11 @@ fun TeacherPage(modifier: Modifier = Modifier) {
 
     var allTeacher by remember { mutableStateOf<List<User>>(emptyList()) }
 
-    LaunchedEffect(Unit) {
-        UserRepository.getAllTeacher { teachers ->
-            allTeacher = teachers
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.isBlank()) {
+            UserRepository.getAllTeacher { allTeacher = it }
+        } else{
+            UserRepository.getTeacherByName(searchQuery) { allTeacher = it }
         }
     }
 
@@ -94,7 +98,7 @@ fun TeacherPage(modifier: Modifier = Modifier) {
             TopAppBar(
                 title = {
                     Text(
-                        "Users",
+                        "Teachers",
                         color = Color.White,
                         fontWeight = FontWeight.Bold
                     )
@@ -132,7 +136,7 @@ fun TeacherPage(modifier: Modifier = Modifier) {
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Search users...") },
+                placeholder = { Text("Search teacher...") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -147,12 +151,11 @@ fun TeacherPage(modifier: Modifier = Modifier) {
                 onRefresh = { refreshData() }
             ) {
                 LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 28.dp),
+                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 28.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(allTeacher) { teacher ->
                         UserCard(teacher)
-                        refreshData()
                     }
                 }
             }

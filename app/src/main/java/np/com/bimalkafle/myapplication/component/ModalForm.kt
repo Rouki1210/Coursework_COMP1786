@@ -13,11 +13,12 @@ import np.com.bimalkafle.myapplication.model.UserRole
 @Composable
 fun ModalForm(
     onDismiss: () -> Unit,
-    onSave: (name: String, email: String, phone: String?, role: UserRole) -> Unit
+    onSave: (name: String, email: String, phone: String?, role: UserRole) -> Unit,
+    initialData: User? = null
 ) {
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf(initialData?.name ?: "") }
+    var email by remember { mutableStateOf(initialData?.email ?: "") }
+    var phone by remember { mutableStateOf(initialData?.phone ?: "") }
     val selectedRole = UserRole.TEACHER
 
     AlertDialog(
@@ -70,7 +71,28 @@ fun ModalForm(
             Button(
                 onClick = {
                     onSave(name, email, phone.takeIf { it.isNotBlank() }, selectedRole)
-                    UserRepository.addUser(User("", name, email, phone, selectedRole))
+                    if (initialData == null) {
+                        // Only add if creating new
+                        UserRepository.addUser(
+                            User(
+                                userId = "",
+                                name = name,
+                                email = email,
+                                phone = phone.takeIf { it.isNotBlank() },
+                                role = selectedRole
+                            )
+                        )
+                    } else {
+                        UserRepository.updateUser(
+                            initialData.copy(
+                                name = name,
+                                email = email,
+                                phone = phone.takeIf { it.isNotBlank() },
+                                role = selectedRole
+                            )
+                        )
+                    }
+                    onDismiss()
                 },
                 enabled = name.isNotBlank() && email.isNotBlank()
             ) {
