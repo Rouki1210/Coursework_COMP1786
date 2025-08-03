@@ -177,8 +177,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             if(showModalAddClass.value){
                 AddClassModal(
                     onDismiss = {showModalAddClass.value = false},
-                    onSave = { name, desc, dayofweek, timeofcourse, price, duration, capacity, teacherId ->
-                        println("Class = $name, $desc, $duration, $capacity, $teacherId, $dayofweek, $timeofcourse, $price")
+                    onSave = { name, desc, dayofweek, timeofcourse, price, duration, capacity, scheduledDate, teacherId ->
+                        println("Class = $name, $desc, $duration, $capacity, $teacherId, $dayofweek, $timeofcourse, $scheduledDate, $price")
                         showModalAddClass.value = false
                     }
                 )

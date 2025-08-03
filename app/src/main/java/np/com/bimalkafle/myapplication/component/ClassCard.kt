@@ -39,7 +39,7 @@ fun ClassCard(aClass: Class) {
             onDismiss = {
                 showEditModal.value = false
             },
-            onSave = { name, desc, dayofweek, timeofcourse, price, duration, capacity, teacher ->
+            onSave = { name, desc, dayofweek, timeofcourse, price, duration, capacity, scheduledDate, teacher ->
                 val updatedClass = classToEdit!!.copy(
                     name = name,
                     description = desc,
@@ -48,6 +48,7 @@ fun ClassCard(aClass: Class) {
                     price = price,
                     durationMinutes = duration,
                     maxCapacity = capacity,
+                    scheduleDate = scheduledDate,
                     teacher = teacher
                 )
                 CourseRepository.updateClass(updatedClass)

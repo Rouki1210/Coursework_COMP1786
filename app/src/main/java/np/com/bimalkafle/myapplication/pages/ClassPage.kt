@@ -119,7 +119,7 @@ fun ClassPage(modifier: Modifier = Modifier) {
             if(showModalAddClass.value){
                 AddClassModal(
                     onDismiss = {showModalAddClass.value = false},
-                    onSave = { name, desc, dayofweek, timeofcourse, price, duration, capacity, teacher ->
+                    onSave = { name, desc, dayofweek, timeofcourse, price, duration, capacity, scheduledDate, teacher ->
                         println("Class = $name, $desc, $duration, $capacity, $teacher, $dayofweek, $timeofcourse, $price")
                         showModalAddClass.value = false
                         refreshData()

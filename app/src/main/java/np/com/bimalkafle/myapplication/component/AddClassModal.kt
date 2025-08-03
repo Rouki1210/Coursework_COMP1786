@@ -128,6 +128,18 @@
                             }
                         }
 
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = scheduledDate,
+                        onValueChange = { scheduledDate = it },
+                        label = { Text("Scheduled Date (yyyy-MM-dd)") },
+                        singleLine = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    )
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -187,17 +199,6 @@
                                 .menuAnchor()
                         )
 
-                        OutlinedTextField(
-                            value = scheduledDate,
-                            onValueChange = { scheduledDate = it },
-                            label = { Text("Scheduled Date (yyyy-MM-dd)") },
-                            singleLine = true,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                        )
-
-
                         ExposedDropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false }
@@ -228,6 +229,7 @@
                             durationMinutes = durationMinutes,
                             maxCapacity = maxCapacity,
                             teacher = selectedTeacher?.name ?: "",
+                            scheduleDate = scheduledDate,
                             createdAt = initialData?.createdAt ?: ""
                         )
                         if(initialData == null){
