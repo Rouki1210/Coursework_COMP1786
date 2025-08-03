@@ -3,6 +3,7 @@ package np.com.bimalkafle.myapplication.controllers
 import com.google.firebase.database.FirebaseDatabase
 import np.com.bimalkafle.myapplication.model.Class
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -13,6 +14,28 @@ object CourseRepository {
         var classId = db.push().key ?: return
         val currentTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
         db.child(classId).setValue(aClass.copy(classId = classId, createdAt = currentTime))
+    }
+
+    fun getNextDateForDay(dayAbbreviation: String): String {
+        val dayMap = mapOf(
+            "Sun" to Calendar.SUNDAY,
+            "Mon" to Calendar.MONDAY,
+            "Tue" to Calendar.TUESDAY,
+            "Wed" to Calendar.WEDNESDAY,
+            "Thu" to Calendar.THURSDAY,
+            "Fri" to Calendar.FRIDAY,
+            "Sat" to Calendar.SATURDAY
+        )
+        val targetDay = dayMap[dayAbbreviation] ?: return ""
+        val calendar = Calendar.getInstance()
+        val today = calendar.get(Calendar.DAY_OF_WEEK)
+
+        var daysUntil = (targetDay - today + 7) % 7
+        if (daysUntil == 0) daysUntil = 7 // Avoid today, get next one
+
+        calendar.add(Calendar.DAY_OF_YEAR, daysUntil)
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return sdf.format(calendar.time)
     }
 
     fun getAllCourse(onResult: (List<Class>) -> Unit) {

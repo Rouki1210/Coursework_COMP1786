@@ -124,7 +124,6 @@ fun ClassPage(modifier: Modifier = Modifier) {
                         showModalAddClass.value = false
                         refreshData()
                     }
-
                 )
             }
 

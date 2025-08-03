@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import  androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import np.com.bimalkafle.myapplication.AuthState
 
 @Composable
 fun LoginPage(modifier: Modifier = Modifier, navController: NavController, authViewModel: AuthViewModel) {
@@ -67,7 +68,7 @@ fun LoginPage(modifier: Modifier = Modifier, navController: NavController, authV
         Button(onClick = {
             authViewModel.login(email, password)
             navController.navigate("home")
-        }) {
+        }, enabled = authViewModel != AuthState.Loading) {
             Text(text = "Login")
         }
 

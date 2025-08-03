@@ -32,6 +32,7 @@
              price: String ,
              durationMinutes: String,
              maxCapacity: String,
+             scheduledDate: String,
              teacher: String) -> Unit,
         initialData: Class? = null
     ) {
@@ -48,6 +49,7 @@
             )
         }
         var selectedTeacher by remember { mutableStateOf<User?>(null) }
+        var scheduledDate by remember { mutableStateOf("") }
 
         var expanded by remember { mutableStateOf(false) }
         val teachers = remember { mutableStateOf<List<User>>(emptyList()) }
@@ -110,10 +112,15 @@
                                 FilterChip(
                                     selected = selectedDays.contains(day),
                                     onClick = {
-                                        selectedDays = if (selectedDays.contains(day)) {
-                                            selectedDays - day
+                                        if (selectedDays.contains(day)) {
+                                            selectedDays = selectedDays - day
                                         } else {
-                                            selectedDays + day
+                                            selectedDays = selectedDays + day
+
+                                            // Suggest next date only if one day is selected (or date field is blank)
+                                            if (selectedDays.size == 1 || scheduledDate.isBlank()) {
+                                                scheduledDate = CourseRepository.getNextDateForDay(day)
+                                            }
                                         }
                                     },
                                     label = { Text(day) }
@@ -180,6 +187,17 @@
                                 .menuAnchor()
                         )
 
+                        OutlinedTextField(
+                            value = scheduledDate,
+                            onValueChange = { scheduledDate = it },
+                            label = { Text("Scheduled Date (yyyy-MM-dd)") },
+                            singleLine = true,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        )
+
+
                         ExposedDropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false }
@@ -225,6 +243,7 @@
                             price,
                             durationMinutes,
                             maxCapacity,
+                            scheduledDate,
                             selectedTeacher?.name ?: ""
                         )
                     },

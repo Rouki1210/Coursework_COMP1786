@@ -23,14 +23,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.auth.oAuthProvider
+import np.com.bimalkafle.myapplication.AuthState
+import np.com.bimalkafle.myapplication.AuthViewModel
 import np.com.bimalkafle.myapplication.component.AddClassModal
 import np.com.bimalkafle.myapplication.component.AddUserModal
 import np.com.bimalkafle.myapplication.pages.*
 import np.com.bimalkafle.myapplication.component.ModalForm
 import np.com.bimalkafle.myapplication.controllers.CourseRepository
+import np.com.bimalkafle.myapplication.controllers.OrderRepository
 import np.com.bimalkafle.myapplication.controllers.UserRepository
 import np.com.bimalkafle.myapplication.model.User
 import np.com.bimalkafle.myapplication.model.Class
+import np.com.bimalkafle.myapplication.model.Order
 
 
 data class DashboardItem(
@@ -44,6 +49,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
     var allUsers by remember { mutableStateOf<List<User>>(emptyList()) }
     var allTeacher by remember { mutableStateOf<List<User>>(emptyList()) }
+    var allOrder by remember { mutableStateOf<List<Order>>(emptyList()) }
     var allClass by remember { mutableStateOf<List<Class>>(emptyList()) }
     val showAddTeacherDialog  = remember { mutableStateOf(false) }
     val showModalAddUser = remember { mutableStateOf(false) }
@@ -51,6 +57,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     val userCount = allUsers.size
     val teacherCount = allTeacher.size
     val classCount = allClass.size
+    val orderCount = allOrder.size
 
 
     LaunchedEffect(Unit) {
@@ -63,13 +70,16 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         CourseRepository.getAllCourse { classes ->
             allClass = classes
         }
+        OrderRepository.getAllOrder { orders ->
+            allOrder = orders
+        }
     }
 
     val dashboardItems = listOf(
         DashboardItem(userCount, "Users", Icons.Default.Person),
         DashboardItem(teacherCount, "Teacher", Icons.Default.School),
         DashboardItem(classCount, "Classes", Icons.Default.Museum),
-        DashboardItem(12, "Orders", Icons.Default.ShoppingCart)
+        DashboardItem(orderCount, "Orders", Icons.Default.ShoppingCart)
     )
 
     Column(
@@ -85,9 +95,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 24.dp, top = 32.dp)
         )
-
-
-
         Spacer(modifier = Modifier.height(15.dp))
 
 

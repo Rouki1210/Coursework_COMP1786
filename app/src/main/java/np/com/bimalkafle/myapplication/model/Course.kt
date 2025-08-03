@@ -9,6 +9,8 @@ data class Class(
     val description: String = "",
     val durationMinutes: String = "",
     val maxCapacity: String = "",
-    val teacher: String = "",            // userId of employee
+    val teacher: String = "",
+    val scheduleDate: String = "",
     val createdAt: String = "",
 )
+

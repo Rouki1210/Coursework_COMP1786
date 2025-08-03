@@ -1,6 +1,8 @@
 package np.com.bimalkafle.myapplication.controllers
 
+import android.util.Log
 import com.google.firebase.database.FirebaseDatabase
+import np.com.bimalkafle.myapplication.model.CartItem
 import np.com.bimalkafle.myapplication.model.Class
 import np.com.bimalkafle.myapplication.model.User
 import np.com.bimalkafle.myapplication.model.UserRole
@@ -146,6 +148,34 @@ object UserRepository {
 
     fun deleteUser(userId: String) {
         db.child(userId).removeValue()
+    }
+
+    fun addCart(userId: String, cartItem: CartItem){
+        val db = FirebaseDatabase.getInstance()
+        val cartItemRef = db.getReference("cartItems").child(cartItem.cartId)
+        val userCartRef = db.getReference("users").child(userId).child("cart")
+
+        // Step 1: Get CartItem data
+        cartItemRef.get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                val cartItem = snapshot.getValue(CartItem::class.java)
+
+                // Step 2: Add to user's cart node
+                if (cartItem != null) {
+                    userCartRef.child(cartItem.cartId).setValue(cartItem)
+                        .addOnSuccessListener {
+                            Log.d("Cart", "Added to user cart successfully.")
+                        }
+                        .addOnFailureListener {
+                            Log.e("Cart", "Failed to add to user cart: ${it.message}")
+                        }
+                }
+            } else {
+                Log.e("Cart", "CartItem not found.")
+            }
+        }.addOnFailureListener {
+            Log.e("Cart", "Failed to fetch cartItem: ${it.message}")
+        }
     }
 }
 
