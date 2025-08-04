@@ -63,7 +63,7 @@ fun TeacherPage(modifier: Modifier = Modifier) {
         if (searchQuery.isBlank()) {
             UserRepository.getAllTeacher { allTeacher = it }
         } else{
-            UserRepository.getTeacherByName(searchQuery) { allTeacher = it }
+            UserRepository.getTeacherByName(searchQuery) {allTeacher = it}
         }
     }
 

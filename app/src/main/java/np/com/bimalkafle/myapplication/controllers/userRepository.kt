@@ -60,18 +60,24 @@ object UserRepository {
             .addOnSuccessListener { snapshot ->
                 val result = mutableListOf<User>()
                 snapshot.children.forEach { child ->
-                    val user = child.getValue(User::class.java)
-                    if (user != null && user.name.contains(userName, ignoreCase = true)) {
-                        result.add(user.copy(userId = child.key ?: ""))
+                    val name = child.child("name").getValue(String::class.java) ?: ""
+
+                    if (name.contains(userName, ignoreCase = true)) {
+                        result.add(
+                            User(
+                                userId = child.key ?: "",
+                                name = name
+                            )
+                        )
                     }
                 }
                 onResult(result)
             }
-            .addOnFailureListener { exception ->
-                // handle failure gracefully
+            .addOnFailureListener {
                 onResult(emptyList())
             }
     }
+
 
 
     fun getTeacherByName(teacherName: String, onResult: (List<User>) -> Unit) {
@@ -79,16 +85,34 @@ object UserRepository {
             .addOnSuccessListener { snapshot ->
                 val result = mutableListOf<User>()
                 snapshot.children.forEach { child ->
-                    val user = child.getValue(User::class.java)
-                    if (user != null &&
-                        user.role == UserRole.TEACHER &&
-                        user.name.contains(teacherName, ignoreCase = true)){
-                        result.add(user.copy(userId = child.key ?: ""))
+                    val name = child.child("name").getValue(String::class.java) ?: ""
+                    val roleStr = child.child("role").getValue(String::class.java)
+                    val role = try {
+                        UserRole.valueOf(roleStr ?: "")
+                    } catch (e: IllegalArgumentException) {
+                        UserRole.CUSTOMER
+                    }
+
+                    if (role == UserRole.TEACHER &&
+                        name.contains(teacherName, ignoreCase = true)
+                    ) {
+                        result.add(
+                            User(
+                                userId = child.key ?: "",
+                                name = name,
+                                role = role
+                                // omit fields that may cause type issues
+                            )
+                        )
                     }
                 }
                 onResult(result)
             }
+            .addOnFailureListener {
+                onResult(emptyList())
+            }
     }
+
 
 
     fun getAllTeacher(onResult: (List<User>) -> Unit) {

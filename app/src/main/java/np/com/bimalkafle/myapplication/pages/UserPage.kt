@@ -1,6 +1,8 @@
 package np.com.bimalkafle.myapplication.pages
 
 
+import android.util.Log
+import android.util.Printer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.LaunchedEffect
@@ -51,7 +54,7 @@ import np.com.bimalkafle.myapplication.controllers.CourseRepository
 fun UserPage(modifier: Modifier = Modifier) {
 
     var searchQuery by remember {
-        mutableStateOf("")
+        mutableStateOf(" ")
     }
     val showModalAddUser = remember { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
@@ -62,7 +65,9 @@ fun UserPage(modifier: Modifier = Modifier) {
         if (searchQuery.isBlank()) {
             UserRepository.getAllUser { allUsers = it }
         } else {
-            UserRepository.getUserByName(searchQuery) { allUsers = it }
+            Log.d("UserSearch", searchQuery)
+            UserRepository.getUserByName(searchQuery) {allUsers = it}
+
         }
     }
 

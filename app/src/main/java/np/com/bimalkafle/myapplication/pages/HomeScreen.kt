@@ -23,8 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.google.firebase.auth.oAuthProvider
-import np.com.bimalkafle.myapplication.AuthState
 import np.com.bimalkafle.myapplication.AuthViewModel
 import np.com.bimalkafle.myapplication.component.AddClassModal
 import np.com.bimalkafle.myapplication.component.AddUserModal
@@ -45,7 +43,7 @@ data class DashboardItem(
 )
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(modifier: Modifier = Modifier, authViewModel: AuthViewModel, navController: NavController) {
 
     var allUsers by remember { mutableStateOf<List<User>>(emptyList()) }
     var allTeacher by remember { mutableStateOf<List<User>>(emptyList()) }
@@ -73,6 +71,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         OrderRepository.getAllOrder { orders ->
             allOrder = orders
         }
+
     }
 
     val dashboardItems = listOf(
@@ -88,14 +87,35 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             .padding(16.dp)
             .background(Color(0xFF121212))
     ) {
-        Text(
-            text = "Welcome Back",
-            color = Color.White,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 24.dp, top = 32.dp)
-        )
-        Spacer(modifier = Modifier.height(15.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 32.dp, bottom = 24.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Welcome Back",
+                color = Color.White,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            IconButton(
+                onClick = {
+                    // TODO: Add actual logout logic here
+                    println("Logout clicked")
+                    authViewModel.signout()
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Logout,
+                    contentDescription = "Logout",
+                    tint = Color.White
+                )
+            }
+        }
+
 
 
         LazyVerticalGrid(

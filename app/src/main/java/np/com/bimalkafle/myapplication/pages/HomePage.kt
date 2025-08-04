@@ -79,14 +79,19 @@ fun HomePage(modifier: Modifier = Modifier, navController: NavController, authVi
             }
         }
     ) { innerPadding ->
-        ContentScreen(modifier = Modifier.padding(innerPadding),selectedIndex)
+        ContentScreen(modifier = Modifier.padding(innerPadding),
+            selectedIndex = selectedIndex,
+            navController = navController,
+            authViewModel = authViewModel)
     }
 }
 
 @Composable
-fun ContentScreen(modifier: Modifier = Modifier, selectedIndex : Int) {
+fun ContentScreen(modifier: Modifier = Modifier, selectedIndex : Int,
+                  navController: NavController,
+                  authViewModel: AuthViewModel) {
     when(selectedIndex){
-        0-> HomeScreen()
+        0-> HomeScreen(navController = navController, authViewModel = authViewModel)
         1-> TeacherPage()
         2-> ClassPage()
         3-> UserPage()
